@@ -3,7 +3,7 @@
 const express = require('express');
 const authRouter = express.Router();
 
-const { users } = require('../models/users.js');
+const users = require('../models/index.js').users;
 const basicAuth = require('../middleware/basic.js')
 const bearerAuth = require('../middleware/bearer.js')
 const permissions = require('../middleware/acl.js')
@@ -11,11 +11,11 @@ const permissions = require('../middleware/acl.js')
 authRouter.post('/signup', async (req, res, next) => {
   try {
     let userRecord = await users.create(req.body);
-    const output = {
-      user: userRecord,
-      token: userRecord.token
-    };
-    res.status(201).json(output);
+    // const output = {
+    //   user: userRecord,
+    //   token: userRecord.token
+    // };
+    res.status(201).json(userRecord);
   } catch (e) {
     next(e.message)
   }
@@ -33,10 +33,6 @@ authRouter.get('/users', bearerAuth, permissions('delete'), async (req, res, nex
   const userRecords = await users.findAll({});
   const list = userRecords.map(user => user.username);
   res.status(200).json(list);
-});
-
-authRouter.get('/secret', bearerAuth, async (req, res, next) => {
-  res.status(200).send('Welcome to the secret area')
 });
 
 module.exports = authRouter;
