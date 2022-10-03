@@ -8,11 +8,12 @@ const Collection = require('./data-collection.js');
 const DATABASE_URL = process.env.DATABASE_URL || 'sqlite:memory:';
 
 const sequelize = new Sequelize(DATABASE_URL);
+
 const pokemonSchema = pokemonModel(sequelize, DataTypes);
+const userSchema = userModel(sequelize, DataTypes);
 
 module.exports = {
   db: sequelize,
   pokemon: new Collection(pokemonSchema),
-  user: new Collection(userModel),
-  users: userModel(sequelize, DataTypes),
+  users: new Collection(userSchema),
 };

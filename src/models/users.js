@@ -2,14 +2,24 @@
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-
 const SECRET = process.env.SECRET || 'secretstring';
 
 const userModel = (sequelize, DataTypes) => {
-  const model = sequelize.define('Users', {
-    username: { type: DataTypes.STRING, required: true, unique: true },
-    password: { type: DataTypes.STRING, required: true },
-    role: { type: DataTypes.ENUM('trainer', 'brock', 'professor', 'ash'), required: true, defaultValue: 'user'},
+  const model = sequelize.define('users', {
+    username: {
+      type: DataTypes.STRING,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: DataTypes.STRING,
+      required: true
+    },
+    role: {
+      type: DataTypes.ENUM('trainer', 'brock', 'professor', 'ash'),
+      required: true,
+      defaultValue: 'trainer'
+    },
     token: {
       type: DataTypes.VIRTUAL,
       get() {
@@ -24,10 +34,24 @@ const userModel = (sequelize, DataTypes) => {
       type: DataTypes.VIRTUAL,
       get() {
         const acl = {
-          trainer: ['read'],
-          brock: ['read', 'create'],
-          professor: ['read', 'create', 'update'],
-          ash: ['read', 'create', 'update', 'delete']
+          trainer: [
+            'read'
+          ],
+          brock: [
+            'read',
+            'create'
+          ],
+          professor: [
+            'read',
+            'create',
+            'update'
+          ],
+          ash: [
+            'read',
+            'create',
+            'update',
+            'delete'
+          ]
         };
         return acl[this.role];
       }
@@ -49,7 +73,7 @@ const userModel = (sequelize, DataTypes) => {
   model.authenticateToken = async function (token) {
     try {
       const parsedToken = jwt.verify(token, SECRET);
-      const user = this.findOne({where: { username: parsedToken.username } });
+      const user = this.findOne({ where: { username: parsedToken.username } });
       if (user) { return user; }
       throw new Error("User Not Found");
     } catch (e) {
